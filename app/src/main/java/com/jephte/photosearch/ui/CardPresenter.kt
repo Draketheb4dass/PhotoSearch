@@ -7,10 +7,12 @@ import androidx.core.content.ContextCompat
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.leanback.widget.BaseCardView
+import androidx.leanback.widget.HorizontalGridView
 
 import com.bumptech.glide.Glide
 import com.jephte.photosearch.R
 import com.jephte.photosearch.data.models.Photo
+import com.jephte.photosearch.util.miliToDateMMDDYYYY
 import timber.log.Timber
 import java.text.DateFormat
 
@@ -23,8 +25,8 @@ class CardPresenter : Presenter() {
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         Timber.d( "onCreateViewHolder")
-        //val horizontalGridView: HorizontalGridView = parent.findViewById(androidx.leanback.R.id.row_content)
-        //horizontalGridView.setItemSpacing(96)
+        val horizontalGridView: HorizontalGridView = parent.findViewById(androidx.leanback.R.id.row_content)
+        horizontalGridView.setItemSpacing(96)
         mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.movie)
 
         val cardView = object : ImageCardView(ContextThemeWrapper(parent.context,
@@ -40,20 +42,24 @@ class CardPresenter : Presenter() {
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
-        val photo = item as Photo
+
         val cardView = viewHolder.view as ImageCardView
 
         Timber.d("onBindViewHolder")
-        if (photo.urlW != null) {
-            cardView.titleText = photo.title
-            cardView.contentText = "${photo.ownerName} / ${DateFormat.getDateInstance().format(photo.uploadDateInMili)}"
-            cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
-            Glide.with(viewHolder.view.context)
-                .load(photo.urlW)
-                .centerCrop()
-                .error(mDefaultCardImage)
-                .into(cardView.mainImageView)
+        if (item is Photo) {
+            val photo = item as Photo
+            if (!photo.urlW.isNullOrEmpty()) {
+                cardView.titleText = photo.title
+                cardView.contentText = "${photo.ownerName} / ${photo.uploadDateInMili.miliToDateMMDDYYYY()}"
+                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
+                Glide.with(viewHolder.view.context)
+                    .load(photo.urlW)
+                    .centerCrop()
+                    .error(mDefaultCardImage)
+                    .into(cardView.mainImageView)
+            }
         }
+
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
@@ -65,7 +71,7 @@ class CardPresenter : Presenter() {
     }
 
     companion object {
-        private val CARD_WIDTH = 500
-        private val CARD_HEIGHT = 250
+        private const val CARD_WIDTH = 500
+        private const val CARD_HEIGHT = 250
     }
 }

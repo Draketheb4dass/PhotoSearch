@@ -6,7 +6,7 @@ data class Photo(
     val id: String,
     val title: String,
     @SerializedName("url_w")
-    val urlW: String,
+    val urlW: String?,
     @SerializedName("ownername")
     val ownerName: String,
     @SerializedName("dateupload")

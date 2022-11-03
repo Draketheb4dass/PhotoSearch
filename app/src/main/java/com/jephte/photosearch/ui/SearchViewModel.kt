@@ -15,4 +15,5 @@ class SearchViewModel @Inject constructor(
     fun search(text: String): LiveData<PhotoResponseModel?> {
         return photoDataSource.search(text).asLiveData()
     }
+    var getRecentPhotos: LiveData<PhotoResponseModel?> =  photoDataSource.getRecentPhotos().asLiveData()
 }
